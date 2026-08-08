@@ -21,8 +21,26 @@ State:    console Phase 2a (health strip + failure surface) is BUILT. All
           M3 Task 7 (production 60-day catch-up) is untouched by this lane
           and remains the critical path there.
 
-Next:     Open the PR for `worktree-console-next` against main. Nothing else
-          is planned or blocked on this lane.
+          SHIPPED AND LIVE 2026-08-08. #71 merged as `9427bde`. doug-api
+          picked it up automatically (rev `doug-api-00083-pay`, 17:17Z, six
+          minutes after the merge) — verified live, not assumed: unauth
+          `/v1/health` and `/v1/jobs` return 401 (gate rejecting, route
+          exists) while an unknown route returns 404. doug-console does NOT
+          redeploy on merge and was deployed by hand from main:
+          rev `doug-console-00006-xx2`, 100% traffic. Gate re-verified after
+          the deploy — unauth returns 403 and the IAM binding is still only
+          `user:drew.jst@gmail.com`, no allUsers.
+
+Next:     Merge PR #73 (`console-health-followups`), then REDEPLOY THE
+          CONSOLE AGAIN — it does not redeploy on merge, and #73 changes
+          both the API (job_health timestamps) and the console (row labels),
+          so doug-api first, then the console by hand.
+          #73 acts on Doug's own review of #71: 3 findings real, 2 disproved
+          by files outside the 48% partial read. Dispositions for all five
+          are in docs/findings-log.jsonl.
+          Still open after that: the Shell health-fetch waterfall (deferred,
+          latency only — React.cache + a Suspense boundary whose fallback is
+          GHOSTED, never "clear"), and console render-test infrastructure.
 
 Blockers: none.
 
